@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="auto">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>隐私政策 · Bilibili 弹幕存档</title>
+<link rel="icon" href="img/icon48.png">
+<script src="lib/theme.js"></script>
+<style>
+:root { --bg: #f4f3ee; --surface: #fff; --ink: #121316; --ink-2: #4c4d55; --muted: #85868f; --line: #e2e0d7; --accent: #f0457a; color-scheme: light; }
+:root[data-theme="dark"] { --bg: #0c0d10; --surface: #16171c; --ink: #f1f1f3; --ink-2: #c3c3cb; --muted: #8b8c97; --line: #26272e; --accent: #ff5c8d; color-scheme: dark; }
+@media (prefers-color-scheme: dark) { :root[data-theme="auto"] { --bg: #0c0d10; --surface: #16171c; --ink: #f1f1f3; --ink-2: #c3c3cb; --muted: #8b8c97; --line: #26272e; --accent: #ff5c8d; color-scheme: dark; } }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.75 -apple-system, BlinkMacSystemFont, "PingFang SC", "Noto Sans SC", "Microsoft YaHei", sans-serif; }
+main { max-width: 720px; margin: 0 auto; padding: 56px 22px 80px; }
+a { color: var(--accent); }
+.back { font-size: 14px; text-decoration: none; }
+h1 { font-size: 34px; line-height: 1.2; margin: 18px 0 6px; letter-spacing: -.02em; }
+.muted { color: var(--muted); font-size: 14px; }
+h2 { font-size: 19px; margin: 36px 0 8px; }
+p, li { color: var(--ink-2); }
+ul { padding-left: 1.2em; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 18px 22px; margin-top: 24px; }
+.card p { margin: 0; color: var(--ink); }
+footer { margin-top: 56px; padding-top: 20px; border-top: 1px solid var(--line); font-size: 13px; color: var(--muted); }
+</style>
+</head>
+<body>
+<main>
+  <a class="back" href="./">← 返回 Bilibili 弹幕存档</a>
+  <h1>隐私政策</h1>
+  <div class="muted">适用于 Chrome 插件「Bilibili 弹幕存档」 · 更新于 2026 年 10 月 24 日</div>
+
+  <div class="card"><p><b>一句话：</b>插件不收集、不上传、不出售任何个人信息。你存的弹幕只在你自己的电脑上。</p></div>
+
+  <h2>插件会接触哪些数据</h2>
+  <ul>
+    <li><b>B 站视频的公开信息和弹幕</b>：视频标题、分P列表、弹幕内容等。插件从你自己的浏览器直接向哔哩哔哩的接口请求这些数据。</li>
+    <li><b>B 站登录状态</b>：插件会向 B 站确认你是否已登录，用来决定能不能「下载完整弹幕」，并在插件里显示你的 B 站昵称。插件不会读取、保存或发送你的密码或 Cookie 内容。</li>
+    <li><b>你的设置</b>：比如弹幕显示样式、在 YouTube / B 站某个视频上选择叠加哪一份存档。</li>
+    <li><b>你自己选择的本地文件</b>：在插件自带的播放器里打开的视频、字幕、弹幕文件，只在你的浏览器里读取和播放，不会上传。</li>
+  </ul>
+
+  <h2>数据存在哪里</h2>
+  <p>所有弹幕存档和设置都保存在你电脑上这个浏览器的本地存储里（IndexedDB 和 chrome.storage）。插件没有任何服务器，开发者看不到你存了什么。卸载插件时，这些数据会被浏览器一起删除；需要保留的话，可以先在弹幕库里点「备份」导出。</p>
+
+  <h2>插件会访问哪些网站</h2>
+  <ul>
+    <li><b>bilibili.com</b>：获取视频信息和弹幕；在 B 站播放器上显示叠加弹幕的按钮。</li>
+    <li><b>b23.tv</b>：解析你粘贴的 B 站短链接。</li>
+    <li><b>youtube.com</b>：只在播放器上添加一个按钮，并把你选择的存档弹幕叠加显示在视频上。插件不读取、不记录你在 YouTube 上的任何活动。</li>
+  </ul>
+
+  <h2>第三方</h2>
+  <p>插件不包含任何广告、统计或追踪代码，不与任何第三方分享数据。</p>
+
+  <h2>政策变更</h2>
+  <p>如果以后插件的数据处理方式有变化，会更新本页面，并修改上面的日期。</p>
+
+  <h2>联系</h2>
+  <p>有任何问题，可以通过 <a href="https://madebyhappy.github.io/">madebyhappy.github.io</a> 联系开发者。</p>
+
+  <footer>本插件是个人开发的非官方工具，与哔哩哔哩（bilibili）、YouTube 没有任何关联。</footer>
+</main>
+</body>
+</html>

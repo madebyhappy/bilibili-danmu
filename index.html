@@ -1,0 +1,544 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="auto">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bilibili 弹幕存档 · 把 B 站弹幕存下来</title>
+<meta name="description" content="一键把 B 站弹幕按时间轴存到本地：增量更新、下载完整弹幕、自动合并分P，配本地视频离线看，或者叠在 YouTube 上看。只存弹幕，不碰视频。免费的 Chrome 插件。">
+<link rel="icon" href="img/icon48.png">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Bilibili 弹幕存档 · 把 B 站弹幕存下来">
+<meta property="og:description" content="一键把 B 站弹幕存到本地，越存越全；导出成字幕格式，本地播放器直接放；还能叠在 YouTube 上看。免费的 Chrome 插件。">
+<meta property="og:url" content="https://madebyhappy.github.io/bilibili-danmu/">
+<meta property="og:image" content="https://madebyhappy.github.io/bilibili-danmu/img/icon128.png">
+<link rel="canonical" href="https://madebyhappy.github.io/bilibili-danmu/">
+<script src="lib/theme.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;700;800&family=Inter:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f4f3ee; --bg-2: #ebe9e1; --surface: #fff; --surface-2: #f8f7f3;
+  --ink: #121316; --ink-2: #4c4d55; --muted: #85868f; --line: #e2e0d7; --line-2: #d4d2c8;
+  --accent: #f0457a; --accent-2: #ff6b98; --accent-ink: #fff; --accent-soft: #ffe6ee;
+  --blue: #1f8fd6; --blue-soft: #e3f2fc; --ok: #16a34a; --err: #dc2f2f;
+  --night: #0c0d10; --night-2: #16171c; --night-line: rgba(255,255,255,.1); --night-ink: #f1f1f3; --night-muted: #9c9da8;
+  --shadow: 0 1px 2px rgba(18,19,22,.04), 0 10px 30px -14px rgba(18,19,22,.16);
+  --shadow-lg: 0 40px 90px -30px rgba(18,19,22,.35);
+  --display: "Bricolage Grotesque", -apple-system, BlinkMacSystemFont, "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --cjk: -apple-system, BlinkMacSystemFont, "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --body: "Inter", -apple-system, BlinkMacSystemFont, "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --ease: cubic-bezier(.2,.8,.2,1);
+  color-scheme: light;
+}
+:root[data-theme="dark"] {
+  --bg: #0c0d10; --bg-2: #14151a; --surface: #16171c; --surface-2: #1c1d23;
+  --ink: #f1f1f3; --ink-2: #c3c3cb; --muted: #8b8c97; --line: #26272e; --line-2: #33343c;
+  --accent: #ff5c8d; --accent-2: #ff86aa; --accent-ink: #1a0610; --accent-soft: #2c1520;
+  --blue: #4fb3f0; --blue-soft: #10263a; --ok: #3ccf6e;
+  --night: #050507; --night-2: #111216;
+  --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 30px -14px rgba(0,0,0,.6);
+  --shadow-lg: 0 40px 90px -30px rgba(0,0,0,.8);
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root[data-theme="auto"] {
+    --bg: #0c0d10; --bg-2: #14151a; --surface: #16171c; --surface-2: #1c1d23;
+    --ink: #f1f1f3; --ink-2: #c3c3cb; --muted: #8b8c97; --line: #26272e; --line-2: #33343c;
+    --accent: #ff5c8d; --accent-2: #ff86aa; --accent-ink: #1a0610; --accent-soft: #2c1520;
+    --blue: #4fb3f0; --blue-soft: #10263a; --ok: #3ccf6e;
+    --night: #050507; --night-2: #111216;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 30px -14px rgba(0,0,0,.6);
+    --shadow-lg: 0 40px 90px -30px rgba(0,0,0,.8);
+    color-scheme: dark;
+  }
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.6 var(--body); overflow-x: hidden; }
+a { color: inherit; }
+h1, h2, h3 { font-family: var(--display); margin: 0; letter-spacing: -.025em; line-height: 1.1; }
+h1 :lang(zh), h2, h3 { font-weight: 800; }
+.wrap { max-width: 1160px; margin: 0 auto; padding: 0 28px; }
+.muted { color: var(--muted); }
+.accent { color: var(--accent); }
+section { padding: 110px 0; }
+.eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; letter-spacing: .02em; color: var(--accent); margin-bottom: 16px; }
+.eyebrow::before { content: ''; width: 18px; height: 2px; background: currentColor; border-radius: 2px; }
+.sec-title { font-size: clamp(32px, 4.6vw, 52px); max-width: 760px; }
+.sec-sub { font-size: 18px; color: var(--ink-2); max-width: 640px; margin: 18px 0 0; }
+
+.btn {
+  display: inline-flex; align-items: center; gap: 8px; height: 50px; padding: 0 24px;
+  border-radius: 999px; font: 600 16px/1 var(--body); text-decoration: none; cursor: pointer;
+  border: 1px solid var(--line-2); background: var(--surface); color: var(--ink);
+  transition: transform .15s var(--ease), background .15s, border-color .15s, box-shadow .15s;
+}
+.btn:hover { transform: translateY(-1px); border-color: var(--ink); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); box-shadow: 0 10px 30px -10px color-mix(in srgb, var(--accent) 70%, transparent); }
+.btn.primary:hover { background: var(--accent-2); border-color: var(--accent-2); }
+.btn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.btn.small { height: 38px; padding: 0 16px; font-size: 14px; }
+
+/* ── 导航 ── */
+.nav { position: sticky; top: 0; z-index: 30; background: color-mix(in srgb, var(--bg) 80%, transparent); backdrop-filter: saturate(1.5) blur(14px); border-bottom: 1px solid transparent; transition: border-color .2s; }
+.nav.scrolled { border-bottom-color: var(--line); }
+.nav .wrap { display: flex; align-items: center; gap: 28px; height: 68px; }
+.brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+.brand img { width: 30px; height: 30px; border-radius: 9px; }
+.wordmark { font-family: var(--display); font-weight: 800; font-size: 19px; letter-spacing: -.02em; }
+.wordmark em { font-style: normal; color: var(--accent); }
+.nav-links { display: flex; gap: 24px; font-size: 14.5px; color: var(--ink-2); }
+.nav-links a { text-decoration: none; }
+.nav-links a:hover { color: var(--ink); }
+.nav .spacer { flex: 1; }
+.icon-btn { width: 38px; height: 38px; border-radius: 999px; display: grid; place-items: center; border: 1px solid var(--line-2); background: var(--surface); color: var(--ink); cursor: pointer; }
+.icon-btn svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+/* ── 首屏 ── */
+.hero { padding: 80px 0 40px; position: relative; }
+.hero::before {
+  content: ''; position: absolute; inset: -120px 0 auto; height: 620px; z-index: -1; pointer-events: none;
+  background: radial-gradient(40% 50% at 15% 30%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 70%),
+              radial-gradient(35% 45% at 85% 20%, color-mix(in srgb, var(--blue) 14%, transparent), transparent 70%);
+}
+.hero-grid { display: grid; grid-template-columns: 1.05fr 1fr; gap: 60px; align-items: center; }
+.hero h1 .nowrap { white-space: nowrap; }
+.hero h1 { font-size: clamp(38px, 5.2vw, 70px); font-family: var(--cjk); font-weight: 900; letter-spacing: -.04em; line-height: 1.04; }
+.hero h1 .strike { position: relative; white-space: nowrap; }
+.hero h1 .strike::after { content: ''; position: absolute; left: -2%; right: -2%; top: 54%; height: .09em; background: var(--accent); border-radius: 4px; transform: rotate(-3deg); transform-origin: left; animation: strike .7s .4s var(--ease) both; }
+@keyframes strike { from { transform: rotate(-3deg) scaleX(0); } }
+.hero .lede { font-size: 19px; color: var(--ink-2); margin: 26px 0 34px; max-width: 520px; }
+.hero-cta { display: flex; gap: 12px; flex-wrap: wrap; }
+.trust { display: flex; gap: 22px; flex-wrap: wrap; margin-top: 30px; font-size: 13.5px; color: var(--muted); }
+.trust span { display: inline-flex; align-items: center; gap: 7px; }
+.trust svg { width: 16px; height: 16px; fill: none; stroke: var(--ok); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+
+.demo { position: relative; }
+.demo-player { position: relative; border-radius: 22px; overflow: hidden; background: #08080b; box-shadow: var(--shadow-lg); aspect-ratio: 16 / 10; }
+.demo-scene { position: absolute; inset: 0; background:
+  radial-gradient(60% 70% at 70% 35%, #ffb36b55, transparent 60%),
+  radial-gradient(70% 80% at 20% 80%, #f0457a66, transparent 60%),
+  radial-gradient(50% 60% at 85% 85%, #1f8fd655, transparent 60%),
+  linear-gradient(160deg, #1b1430, #0a0a12 70%); }
+.demo-scene .sun { position: absolute; width: 28%; aspect-ratio: 1; right: 16%; top: 22%; border-radius: 50%; background: radial-gradient(circle at 40% 40%, #ffe3b0, #ff9d5c 60%, #f0457a); filter: blur(.5px); opacity: .9; }
+.demo-scene .hills { position: absolute; inset: auto 0 0; height: 42%; background: linear-gradient(180deg, transparent, #07070c 75%), radial-gradient(120% 100% at 30% 100%, #2a1838 50%, transparent 51%), radial-gradient(120% 100% at 85% 110%, #1a1530 50%, transparent 51%); }
+.demo-player canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.demo-bar { position: absolute; left: 0; right: 0; bottom: 0; height: 46px; display: flex; align-items: center; gap: 12px; padding: 0 16px; background: linear-gradient(transparent, rgba(0,0,0,.65)); color: #fff; font-size: 12px; }
+.demo-bar .track { flex: 1; height: 4px; border-radius: 4px; background: rgba(255,255,255,.25); overflow: hidden; }
+.demo-bar .track i { display: block; height: 100%; width: 0; background: var(--accent); }
+.demo-bar svg { width: 15px; height: 15px; fill: #fff; }
+.demo-card {
+  position: absolute; right: -18px; bottom: -34px; width: 250px;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 14px 16px;
+  box-shadow: var(--shadow-lg); font-size: 13px;
+  animation: float 6s ease-in-out infinite;
+}
+@keyframes float { 50% { transform: translateY(-6px); } }
+.demo-card .row { display: flex; align-items: center; gap: 8px; }
+.demo-card img { width: 22px; height: 22px; border-radius: 6px; }
+.demo-card b { font-family: var(--display); font-size: 26px; letter-spacing: -.02em; }
+.demo-card .bar { height: 6px; border-radius: 6px; background: var(--bg-2); overflow: hidden; margin: 8px 0 6px; }
+.demo-card .bar i { display: block; height: 100%; width: 0; border-radius: 6px; background: linear-gradient(90deg, var(--accent), var(--blue)); transition: width .6s var(--ease); }
+.demo-card .ok { color: var(--ok); font-weight: 600; }
+
+/* ── 痛点 ── */
+.pains { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 50px; }
+.pain { background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: 26px 22px; box-shadow: var(--shadow); }
+.pain .em { font-size: 30px; line-height: 1; margin-bottom: 18px; display: block; }
+.pain h3 { font-family: var(--cjk); font-size: 19px; font-weight: 700; letter-spacing: -.01em; line-height: 1.35; margin-bottom: 8px; }
+.pain p { margin: 0; color: var(--ink-2); font-size: 14.5px; }
+
+/* ── 功能：一屏看完 ── */
+.bento { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-top: 40px; }
+.tile { background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: 22px; box-shadow: var(--shadow); }
+.tile.wide { grid-column: span 2; }
+.tile.dark { background: var(--night); color: var(--night-ink); border-color: transparent; }
+.tile.dark p { color: var(--night-muted); }
+.tile.dark p strong { color: #fff; font-weight: 700; }
+.hero-tile { padding: 26px 28px; }
+/* 卡片右上角的 ＋ / −：展开看详细说明 */
+.tile { position: relative; }
+.more summary {
+  position: absolute; top: 16px; right: 16px; width: 28px; height: 28px; border-radius: 50%;
+  display: grid; place-items: center; cursor: pointer; list-style: none;
+  border: 1px solid var(--line-2); color: var(--muted); background: var(--surface);
+  font: 400 18px/1 var(--body); transition: border-color .15s, color .15s;
+}
+.more .faq summary::-webkit-details-marker { display: none; }
+.more summary::before { content: '+'; }
+.more[open] summary::before { content: '−'; }
+.more summary:hover { border-color: var(--accent); color: var(--accent); }
+.tile.dark .more summary { background: transparent; border-color: rgba(255,255,255,.2); color: #bbb; }
+.more-body { margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--line-2); }
+.tile.dark .more-body { border-top-color: rgba(255,255,255,.15); }
+.more-body p + p { margin-top: 8px; }
+.hero-tile h3 { font-size: 23px; margin-bottom: 8px; }
+.hero-tile p { font-size: 15px; }
+.tile .ic { width: 36px; height: 36px; border-radius: 11px; display: grid; place-items: center; background: var(--accent-soft); color: var(--accent); margin-bottom: 14px; }
+.tile.dark .ic { background: rgba(255,255,255,.08); color: #ff86aa; }
+.tile .ic svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+.tile h3 { font-family: var(--cjk); font-size: 17px; font-weight: 800; letter-spacing: -.01em; line-height: 1.35; margin-bottom: 6px; }
+.tile p { margin: 0; color: var(--ink-2); font-size: 14px; line-height: 1.55; }
+
+/* ── 三步 ── */
+.steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 50px; counter-reset: s; }
+.step { padding: 28px; border-radius: 22px; border: 1px solid var(--line); background: var(--surface); }
+.step::before { counter-increment: s; content: counter(s); display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; background: var(--ink); color: var(--bg); font: 800 17px/1 var(--display); margin-bottom: 18px; }
+.step h3 { font-family: var(--cjk); font-size: 19px; font-weight: 700; margin-bottom: 6px; }
+.step p { margin: 0; color: var(--ink-2); font-size: 14.5px; }
+
+/* ── 安装 ── */
+.install { display: grid; grid-template-columns: 1fr 1fr; gap: 50px; align-items: start; }
+.install-card { background: var(--surface); border: 1px solid var(--line); border-radius: 26px; padding: 34px; box-shadow: var(--shadow); }
+.install-card ol { margin: 22px 0 0; padding: 0; list-style: none; counter-reset: i; }
+.install-card li { counter-increment: i; display: grid; grid-template-columns: 30px 1fr; gap: 10px; padding: 12px 0; border-top: 1px solid var(--line); font-size: 15px; }
+.install-card li::before { content: counter(i); width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; background: var(--accent-soft); color: var(--accent); font: 800 13px/1 var(--display); }
+.install-card li b { color: var(--ink); }
+.install-card li > span { display: block; }
+.warn { display: block; margin-top: 8px; padding: 8px 11px; border-radius: 10px; background: color-mix(in srgb, #f0a92b 14%, transparent); color: var(--ink); font-size: 13.5px; }
+.warn::before { content: '⚠️ '; }
+.copy-row { display: inline-flex; align-items: center; gap: 8px; margin-top: 8px; }
+.copy-btn { font: 600 12px/1 var(--body); padding: 6px 11px; border-radius: 999px; border: 1px solid var(--line-2); background: var(--surface); color: var(--ink); cursor: pointer; }
+.copy-btn:hover { border-color: var(--accent); color: var(--accent); }
+.copy-btn.done { color: var(--ok); border-color: var(--ok); }
+/* 用 CSS 画的 Chrome 扩展程序页面上的开关和按钮，让人知道要找的是哪个 */
+.mock { display: flex; align-items: center; gap: 10px; width: fit-content; margin-top: 8px; padding: 8px 12px; border-radius: 10px; background: #f1f3f4; border: 1px solid #dadce0; font: 500 13px/1 Roboto, -apple-system, "PingFang SC", sans-serif; color: #3c4043; }
+.mock-switch { width: 34px; height: 14px; border-radius: 7px; background: #a8c7fa; position: relative; }
+.mock-switch::after { content: ''; position: absolute; right: -2px; top: -3px; width: 20px; height: 20px; border-radius: 50%; background: #0b57d0; box-shadow: 0 1px 3px rgba(0,0,0,.3); }
+.mock-btn { padding: 8px 14px; border-radius: 999px; border: 1px solid #747775; color: #0b57d0; background: #fff; }
+.install-notes { margin-top: 26px; max-width: 460px; font-size: 14px; color: var(--ink-2); }
+.install-notes p { margin: 0 0 10px; }
+.install-notes b { color: var(--ink); display: block; margin-bottom: 2px; }
+code { font: 500 13px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace; background: var(--bg-2); padding: 2px 6px; border-radius: 6px; }
+.privacy { display: flex; gap: 10px; align-items: flex-start; margin-top: 22px; padding: 14px 16px; border-radius: 14px; background: var(--surface); border: 1px solid var(--line); font-size: 14px; color: var(--ink-2); max-width: 460px; }
+.privacy svg { width: 18px; height: 18px; flex: none; margin-top: 2px; fill: none; stroke: var(--ok); stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+.privacy b { color: var(--ink); }
+.store-soon { display: inline-flex; align-items: center; gap: 8px; margin-top: 14px; font-size: 13.5px; color: var(--muted); }
+
+/* ── FAQ ── */
+.faq { margin-top: 40px; display: grid; grid-template-columns: 1fr 1fr; gap: 0 40px; }
+.faq details { border-top: 1px solid var(--line); padding: 20px 0; }
+.faq summary { cursor: pointer; list-style: none; font-weight: 600; font-size: 17px; display: flex; justify-content: space-between; gap: 16px; }
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary::after { content: '+'; font: 400 24px/1 var(--display); color: var(--muted); transition: transform .2s; }
+.faq details[open] summary::after { transform: rotate(45deg); }
+.faq details p { margin: 10px 0 0; color: var(--ink-2); font-size: 15px; }
+
+/* ── 结尾 ── */
+.final { text-align: center; padding: 120px 0 130px; }
+.final h2 { font-family: var(--cjk); font-size: clamp(36px, 5.6vw, 68px); font-weight: 900; letter-spacing: -.04em; }
+.final p { color: var(--ink-2); font-size: 18px; margin: 18px 0 32px; }
+footer { border-top: 1px solid var(--line); padding: 30px 0 40px; font-size: 13px; color: var(--muted); }
+footer .foot { display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; }
+footer .foot p { margin: 0; max-width: 560px; line-height: 1.6; }
+footer .made-by { font-family: var(--display); font-weight: 700; font-size: 14px; color: var(--ink-2); text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+footer .made-by:hover { color: var(--accent); }
+footer .foot-links { display: inline-flex; gap: 10px; align-items: center; }
+footer .foot-links > a:first-child { color: var(--muted); font-size: 13px; }
+
+.reveal { opacity: 0; transform: translateY(18px); transition: opacity .7s var(--ease), transform .7s var(--ease); }
+.reveal.in { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; transform: none; } .demo-card, .hero h1 .strike::after { animation: none; } }
+
+@media (max-width: 980px) {
+  section { padding: 80px 0; }
+  .hero-grid, .install { grid-template-columns: 1fr; gap: 50px; }
+  .demo-card { right: 10px; }
+  .pains { grid-template-columns: 1fr 1fr; }
+  .bento { grid-template-columns: 1fr 1fr; }
+  .tile.wide { grid-column: span 2; }
+  .nav-links { display: none; }
+}
+@media (max-width: 640px) {
+  .wrap { padding: 0 18px; }
+  .hero { padding-top: 46px; }
+  .pains, .steps, .faq, .bento { grid-template-columns: 1fr; }
+  .tile.wide { grid-column: auto; }
+  .demo-card { position: relative; right: auto; bottom: auto; margin: -30px auto 0; }
+  .nav .btn span { display: none; }
+}
+</style>
+</head>
+<body>
+
+<nav class="nav" id="nav">
+  <div class="wrap">
+    <a class="brand" href="#"><img src="img/icon48.png" alt=""><span class="wordmark"><em>Bilibili</em> 弹幕存档</span></a>
+    <div class="nav-links">
+      <a href="#pain">为什么需要</a><a href="#features">能做什么</a><a href="#install">安装</a><a href="#faq">问题</a>
+    </div>
+    <span class="spacer"></span>
+    <button class="icon-btn" data-theme-toggle></button>
+    <a class="btn primary small" href="#install"><svg viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 19h14"/></svg><span>免费安装</span></a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <div class="eyebrow">Bilibili 弹幕存档 · Chrome 插件</div>
+      <h1><span class="nowrap">视频会<span class="strike">消失</span>，</span><br><span class="nowrap">弹幕要<span class="accent">留下</span>。</span></h1>
+      <p class="lede">一键把 B 站弹幕按时间轴存到本地，越存越全。配本地视频离线看、叠到 YouTube 上看、把两个 UP 主的弹幕放一起看。</p>
+      <div class="hero-cta">
+        <a class="btn primary" href="#install"><svg viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 19h14"/></svg>免费安装插件</a>
+        <a class="btn" href="#features">看看它能做什么 →</a>
+      </div>
+      <div class="trust">
+        <span><svg viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></svg>只存弹幕，不碰视频</span>
+        <span><svg viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></svg>数据只在你自己的浏览器里</span>
+        <span><svg viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></svg>免费</span>
+      </div>
+    </div>
+    <div class="demo">
+      <div class="demo-player">
+        <div class="demo-scene"><div class="sun"></div><div class="hills"></div></div>
+        <canvas id="heroCanvas"></canvas>
+        <div class="demo-bar"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg><span id="heroTime">00:00</span><div class="track"><i id="heroProg"></i></div><span>第 7 集</span></div>
+      </div>
+      <div class="demo-card">
+        <div class="row"><img src="img/icon48.png" alt=""><strong>弹幕存档</strong><span class="muted" style="margin-left:auto;font-size:12px" id="heroState">存档中…</span></div>
+        <div class="bar"><i id="heroBar"></i></div>
+        <div class="row"><b id="heroCount">0</b><span class="muted">条弹幕</span><span class="ok" style="margin-left:auto" id="heroAdd"></span></div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section id="pain">
+  <div class="wrap">
+    <div class="eyebrow">为什么需要</div>
+    <h2 class="sec-title reveal">弹幕是 B 站最好看的部分，<br>也是最容易丢的部分。</h2>
+    <div class="pains">
+      <div class="pain reveal"><span class="em">🫥</span><h3>追的剧突然看不了了</h3><p>视频没了，几万条弹幕也跟着一起没了。别处找到片源，也找不回当时的弹幕。</p></div>
+      <div class="pain reveal"><span class="em">🧹</span><h3>老弹幕被挤掉</h3><p>每个视频的弹幕池有上限。新弹幕一多，第一批观众的名场面就看不到了。</p></div>
+      <div class="pain reveal"><span class="em">🔇</span><h3>本地视频没弹幕</h3><p>下载到电脑上的视频干干净净，像在看另一部剧——少了一半的乐趣。</p></div>
+      <div class="pain reveal"><span class="em">🧩</span><h3>一集被拆成十几段</h3><p>为了上传方便，一集常被切成 01_001、01_002……弹幕断断续续，没法连着看。</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="features" style="padding-top:20px">
+  <div class="wrap">
+    <div class="eyebrow">能做什么</div>
+    <h2 class="sec-title reveal">存下来，补回来，<br>在哪儿都能看。</h2>
+    <div class="bento">
+      <div class="tile wide dark hero-tile reveal">
+        <div class="ic"><svg viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg></div>
+        <h3>导出弹幕，本地播放器直接放</h3>
+        <p>每条弹幕都被写成一句<strong>「会移动的字幕」</strong>（ASS 格式）。和视频同名放一起，用平时看视频的播放器打开，弹幕就在画面上飞——不用装任何东西，断网也能看。</p>
+        <details class="more"><summary aria-label="展开详细说明"></summary><div class="more-body"><p>ASS 是字幕组常用的字幕格式。弹幕存档把每条弹幕的位置、颜色、速度都算好，写成一句从右往左移动的字幕，所以平时看视频的播放器就能放。</p><p>显示区域（只占上面一部分还是全屏）、字号、速度、透明度、屏蔽词，在插件的「导出设置」里调好再导出。</p><p>另外也能导出 XML（B 站原始格式），留作备份。</p></div></details>
+      </div>
+      <div class="tile reveal">
+        <div class="ic"><svg viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M4 17v3h16v-3"/></svg></div>
+        <h3>一键存档，越存越全</h3>
+        <p>在视频页点一下就存。隔几天点「更新」，只加新弹幕，一条不重复。</p>
+        <details class="more"><summary aria-label="展开详细说明"></summary><div class="more-body"><p>两个弹幕接口一起拉、按弹幕 ID 去重，第一次存就比 B 站单次给的多。</p><p>B 站的弹幕池有上限，新弹幕多了老弹幕就会被挤掉；存档只加不减，隔一段时间点「更新」，就越存越全。</p></div></details>
+      </div>
+      <div class="tile reveal">
+        <div class="ic"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="7" height="7" rx="1.5"/><rect x="14" y="4" width="7" height="7" rx="1.5"/><rect x="3" y="13" width="7" height="7" rx="1.5"/><rect x="14" y="13" width="7" height="7" rx="1.5"/></svg></div>
+        <h3>整个合集，一次存完</h3>
+        <p>合集里的视频一点就全列出来，也可以一次贴好几个链接。</p>
+        <details class="more"><summary aria-label="展开详细说明"></summary><div class="more-body"><p>视频在 UP 主的合集里时，点「显示整个合集」就能把合集里的所有视频列出来一起勾。</p><p>输入框也可以一次贴好几个链接，一行一个；查不到的会单独提示，其他的照样存。</p></div></details>
+      </div>
+      <div class="tile reveal">
+        <div class="ic"><svg viewBox="0 0 24 24"><path d="M4 7h7M4 12h7M4 17h7M15 7l4 5-4 5"/></svg></div>
+        <h3>自动认集数，合并分P</h3>
+        <p>分P叫 01_002、02_0001？自动认出第几集，拼成完整的一集。</p>
+        <details class="more"><summary aria-label="展开详细说明"></summary><div class="more-body"><p>认得出 01.1、01_002、02_0001、第1集-2、第二集 这些写法，「看下一P」这种不是正片的自动跳过。</p><p>一键勾好每集的所有分P，存完每集首尾相接拼成一条；以后分P更新了，合并版也跟着自动更新。</p></div></details>
+      </div>
+      <div class="tile reveal">
+        <div class="ic"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M10 9.5v5l4-2.5z"/></svg></div>
+        <h3>自带播放器</h3>
+        <p>拖进本地视频，弹幕、字幕一起叠上；两个 UP 主的弹幕可以同屏。</p>
+        <details class="more"><summary aria-label="展开详细说明"></summary><div class="more-body"><p>拖进本地视频，弹幕和字幕（.srt / .ass，GBK 编码也不乱码）一起叠上。</p><p>两个 UP 主的弹幕可以同屏，各自用 ▲▼ 对齐开头。倍速、网页全屏、全屏，弹幕都跟着。</p></div></details>
+      </div>
+      <div class="tile reveal">
+        <div class="ic"><svg viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></div>
+        <h3>叠在 YouTube 和 B 站其他视频上</h3>
+        <p>YouTube 上也有这部剧？点播放器角落的按钮，把存档的弹幕叠上去。</p>
+        <details class="more"><summary aria-label="展开详细说明"></summary><div class="more-body"><p>播放器角落多一个按钮，选一份存档就能看；暂停、拖动、倍速、全屏都同步。</p><p>在 B 站看另一个 UP 主的版本，也能把这边存的弹幕叠上去，原来的弹幕照常显示。每个视频会记住你的选择。</p></div></details>
+      </div>
+      <div class="tile reveal">
+        <div class="ic"><svg viewBox="0 0 24 24"><path d="M12 3v9M8 8.5l4 4 4-4"/><path d="M4 15l8 4 8-4"/><path d="M4 19l8 4 8-4" opacity=".55"/></svg></div>
+        <h3>下载完整弹幕</h3>
+        <p>弹幕上万条的视频，老弹幕早被挤掉了。勾一下，把它们一起找回来。</p>
+        <details class="more"><summary aria-label="展开详细说明"></summary><div class="more-body"><p>B 站每个视频的弹幕池有上限，新弹幕进来，老弹幕就被挤出去，普通下载只能拿到现在池子里的那些。</p><p>B 站另外按日期保存了每天的弹幕池，「下载完整弹幕」会一天天往回翻，把被挤掉的老弹幕（比如首播那几天的）补回来。只在弹幕超过 1 万条的视频上出现，需要先在浏览器里登录 B 站。</p></div></details>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section style="padding-top:20px">
+  <div class="wrap">
+    <div class="eyebrow">怎么用</div>
+    <h2 class="sec-title reveal">三步。</h2>
+    <div class="steps">
+      <div class="step reveal"><h3>打开 B 站视频</h3><p>番剧、合集、稍后再看都行。也可以直接在插件里粘贴链接。</p></div>
+      <div class="step reveal"><h3>点插件图标，存档</h3><p>勾上要存的分P，点一下。后台在跑，关掉小窗也不中断。</p></div>
+      <div class="step reveal"><h3>在哪儿都能看</h3><p>自带播放器、本地播放器（ASS）、YouTube、B 站其他视频。</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="install" style="padding-top:20px">
+  <div class="wrap install">
+    <div>
+      <div class="eyebrow">安装</div>
+      <h2 class="sec-title reveal">两分钟装好。</h2>
+      <p class="sec-sub reveal">支持 Chrome，以及 Edge、Arc、Brave 等基于 Chromium 的浏览器。</p>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:30px" class="reveal">
+        <a class="btn primary" href="download/bili-danmaku-archive-v0.1.1.zip" download><svg viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 19h14"/></svg>下载插件 v0.1.1</a>
+      </div>
+      <div class="store-soon reveal"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Chrome 应用商店版准备中</div>
+      <div class="privacy reveal"><svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><span><b>隐私：</b>插件不连任何服务器，所有请求都从你自己的浏览器发出，弹幕只存在你自己的电脑上。</span></div>
+      <div class="install-notes reveal">
+        <p><b>Chrome 启动时提示「停用开发者模式扩展程序」？</b>直接点关闭就行，插件照常能用。这是手动安装的插件都会有的提示，上架应用商店后就没有了。</p>
+        <p><b>以后怎么更新？</b>下载新的 zip，解压后把旧文件夹里的东西整个换掉，再去 <code>chrome://extensions</code> 点插件卡片上的 ⟳。弹幕库里存的弹幕不会丢。</p>
+      </div>
+    </div>
+    <div class="install-card reveal">
+      <strong style="font-family:var(--cjk);font-size:19px">手动安装（5 步）</strong>
+      <ol>
+        <li><span><b>下载并解压</b>：点左边的按钮下载 zip，双击解压，得到 <code>bili-danmaku-archive</code> 文件夹。
+          <span class="warn">把它放到一个不会删掉的地方（比如「文稿」）。装好后这个文件夹不能删、不能挪，不然插件就没了。</span></span></li>
+        <li><span><b>打开扩展程序页面</b>：在地址栏输入下面这串，按回车（这个网址点不开，只能复制粘贴）。
+          <span class="copy-row"><code id="extUrl">chrome://extensions</code><button type="button" class="copy-btn" data-copy="chrome://extensions">复制</button></span></span></li>
+        <li><span><b>打开「开发者模式」</b>：在页面右上角。
+          <span class="mock"><span class="mock-label">开发者模式</span><span class="mock-switch"></span></span></span></li>
+        <li><span><b>加载插件</b>：点左上角的按钮，选第 1 步解压出来的文件夹。
+          <span class="mock"><span class="mock-btn">加载已解压的扩展程序</span></span></span></li>
+        <li><span><b>固定到工具栏</b>：点浏览器右上角的拼图图标 🧩，在「Bilibili 弹幕存档」旁边点 📌。然后打开任意 B 站视频，点工具栏里的粉色图标就能存了。</span></li>
+      </ol>
+    </div>
+    </div>
+  </div>
+</section>
+
+<section id="faq" style="padding-top:20px">
+  <div class="wrap">
+    <div class="eyebrow">常见问题</div>
+    <h2 class="sec-title reveal">你可能想问。</h2>
+    <div class="faq">
+      <div>
+        <details><summary>会下载视频吗？</summary><p>不会。它只存弹幕（时间、内容、颜色、字号）。视频由你自己准备。</p></details>
+        <details><summary>弹幕存在哪？会上传吗？</summary><p>存在插件自己的本地存储里，只在你这台电脑的这个浏览器里。所有请求都从你自己的浏览器发出，不经过任何服务器。卸载前记得点「备份」。</p></details>
+        <details><summary>视频已经看不了了，还能存吗？</summary><p>不能——B 站接口已经查不到了。这正是它存在的理由：趁视频还在，先存下来；以后视频不见了，存档还在。</p></details>
+      </div>
+      <div>
+        <details><summary>需要登录 B 站吗？</summary><p>普通存档不需要。「下载完整弹幕」需要你在这个浏览器里登录 B 站（插件用的是你自己的登录状态，不会读取或保存密码）。</p></details>
+        <details><summary>本地播放器怎么显示弹幕？</summary><p>点「ASS」导出，把文件改成和视频同名放在一起，用平时看视频的播放器打开就会自动加载。或者直接用插件自带的播放器。</p></details>
+        <details><summary>导出的 ASS 能在播放器里改位置、字号吗？</summary><p>弹幕的位置、字号、速度在导出那一刻就写进文件了，播放器一般只能整体调「字幕延迟」（对齐时间），有的能整体缩放。想要只占上 25%、字更大或更慢，在插件的「导出设置」里改好，重新导出一份就行，几秒钟。</p></details>
+        <details><summary>收费吗？</summary><p>免费。</p></details>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="final">
+  <div class="wrap">
+    <h2 class="reveal">趁视频还在，<br><span class="accent">先存下来。</span></h2>
+    <p class="reveal">哪天视频不见了，弹幕还在。</p>
+    <a class="btn primary reveal" href="#install"><svg viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 19h14"/></svg>免费安装插件</a>
+  </div>
+</div>
+
+<footer>
+  <div class="wrap foot">
+    <p>弹幕内容归发送者和哔哩哔哩所有，仅供个人存档与观看，请勿二次分发。本工具与哔哩哔哩、YouTube 无关联。</p>
+    <span class="foot-links"><a href="privacy.html">隐私政策</a> · <a class="made-by" href="https://madebyhappy.github.io/" target="_blank" rel="noopener">Made by Happy</a></span>
+  </div>
+</footer>
+
+<script src="lib/layout.js"></script>
+<script>
+(() => {
+  const $ = (s) => document.querySelector(s);
+
+  // 导航滚动后加分隔线；元素进入视野时淡入
+  addEventListener('scroll', () => $('#nav').classList.toggle('scrolled', scrollY > 10), { passive: true });
+  const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { threshold: .12 });
+  document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
+
+  // 安装步骤里的「复制」按钮
+  document.querySelectorAll('[data-copy]').forEach((b) => b.addEventListener('click', async () => {
+    let ok = false;
+    try { await navigator.clipboard.writeText(b.dataset.copy); ok = true; } catch { /* 有的浏览器不给剪贴板权限，下面用老办法 */ }
+    if (!ok) {
+      const t = Object.assign(document.createElement('textarea'), { value: b.dataset.copy });
+      t.style.cssText = 'position:fixed;opacity:0';
+      document.body.append(t); t.select();
+      try { ok = document.execCommand('copy'); } catch { ok = false; }
+      t.remove();
+    }
+    b.textContent = ok ? '已复制' : '请手动复制';
+    b.classList.toggle('done', ok);
+    setTimeout(() => { b.textContent = '复制'; b.classList.remove('done'); }, 1800);
+  }));
+
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // ── 首屏演示：用插件同一套排版引擎，循环播放一段示例弹幕 ──
+  (function hero() {
+    const canvas = $('#heroCanvas'), ctx = canvas.getContext('2d');
+    const words = ['来了来了', '前方高能！！', '名场面', '哈哈哈哈哈哈', '这段我能看一百遍', 'awsl', '泪目了', '好甜啊啊啊', '存档了，安心', '打卡', '第三遍刷', '这个配乐绝了', 'BGM 是什么', '弹幕护体', '3.9w 了', '经典永流传', '笑死', '好家伙', '高糖预警', '谁懂啊'];
+    const colors = [0xffffff, 0xffffff, 0xffffff, 0xffffff, 0xff7aa2, 0xffe066, 0x7fd6ff, 0x9dffb0];
+    const LOOP = 24;
+    const list = [];
+    for (let i = 0; i < 70; i++) {
+      const t = (i * 9.37) % LOOP;
+      list.push({ id: 'h' + i, t, m: i % 19 === 0 ? 5 : 1, s: i % 11 === 0 ? 36 : 25, c: colors[i % colors.length], x: words[(i * 7) % words.length] });
+    }
+    list.sort((a, b) => a.t - b.t);
+    const settings = Object.assign({}, BDA.DEFAULTS, { fontSize: 54, area: .62, opacity: .95, scrollTime: 9, offset: 0 });
+    const measure = BDA.canvasMeasurer(settings.font);
+    let items = [], W = 0, H = 0, dpr = 1;
+    function size() {
+      const r = canvas.getBoundingClientRect();
+      dpr = devicePixelRatio || 1;
+      W = r.width; H = r.height;
+      canvas.width = W * dpr; canvas.height = H * dpr;
+      // 首尾各多排一圈，循环时不断档
+      const ext = list.map((d) => Object.assign({}, d, { t: d.t - LOOP })).concat(list, list.map((d) => Object.assign({}, d, { t: d.t + LOOP })));
+      items = BDA.layout(ext, W, H, settings, measure);
+    }
+    new ResizeObserver(size).observe(canvas);
+    const start = performance.now();
+    function frame(now) {
+      const t = reduce ? 6 : ((now - start) / 1000) % LOOP;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, W, H);
+      ctx.textBaseline = 'top'; ctx.lineJoin = 'round'; ctx.lineWidth = Math.max(2, H / 300);
+      for (const it of items) {
+        if (it.t > t || t >= it.end) continue;
+        const x = it.kind === 'scroll' ? W - (t - it.t) * it.v : (W - it.w) / 2;
+        ctx.font = `600 ${it.size}px "PingFang SC", "Noto Sans SC", sans-serif`;
+        ctx.strokeStyle = 'rgba(0,0,0,.55)';
+        ctx.fillStyle = '#' + it.dm.c.toString(16).padStart(6, '0');
+        ctx.globalAlpha = settings.opacity;
+        ctx.strokeText(it.text, x, it.y); ctx.fillText(it.text, x, it.y);
+      }
+      $('#heroProg').style.width = (t / LOOP * 100) + '%';
+      $('#heroTime').textContent = `00:${String(Math.floor(t)).padStart(2, '0')}`;
+      if (!reduce) requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+
+    // 小卡片：模拟存档计数
+    const total = 12463;
+    let n = 0;
+    const tick = () => {
+      n = Math.min(total, n + Math.ceil(total / 40));
+      $('#heroCount').textContent = n.toLocaleString('zh-CN');
+      $('#heroBar').style.width = (n / total * 100) + '%';
+      if (n < total) setTimeout(tick, 45);
+      else { $('#heroState').textContent = '刚刚'; $('#heroAdd').textContent = '✓ 已存档'; }
+    };
+    setTimeout(tick, reduce ? 0 : 600);
+  })();
+
+})();
+</script>
+</body>
+</html>
