@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="auto">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>已卸载 · Bilibili 弹幕存档</title>
+<link rel="icon" href="img/icon48.png">
+<script src="lib/theme.js"></script>
+<script src="lib/lang.js"></script>
+<style>
+:root { --bg: #f4f3ee; --bg-2: #ebe9e1; --surface: #fff; --ink: #121316; --ink-2: #4c4d55; --muted: #85868f; --line: #e2e0d7; --line-2: #d4d2c8; --accent: #f0457a; --accent-2: #ff6b98; --accent-ink: #fff; --accent-soft: #ffe6ee; --ok: #16a34a; --err: #dc2f2f; color-scheme: light; }
+:root[data-theme="dark"] { --bg: #0c0d10; --bg-2: #14151a; --surface: #16171c; --ink: #f1f1f3; --ink-2: #c3c3cb; --muted: #8b8c97; --line: #26272e; --line-2: #33343c; --accent: #ff5c8d; --accent-2: #ff86aa; --accent-ink: #1a0610; --accent-soft: #2c1520; --ok: #3ccf6e; --err: #ff6b6b; color-scheme: dark; }
+@media (prefers-color-scheme: dark) { :root[data-theme="auto"] { --bg: #0c0d10; --bg-2: #14151a; --surface: #16171c; --ink: #f1f1f3; --ink-2: #c3c3cb; --muted: #8b8c97; --line: #26272e; --line-2: #33343c; --accent: #ff5c8d; --accent-2: #ff86aa; --accent-ink: #1a0610; --accent-soft: #2c1520; --ok: #3ccf6e; --err: #ff6b6b; color-scheme: dark; } }
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.7 -apple-system, BlinkMacSystemFont, "PingFang SC", "Noto Sans SC", "Microsoft YaHei", sans-serif; -webkit-font-smoothing: antialiased; }
+main { max-width: 640px; margin: 0 auto; padding: 48px 16px 72px; }
+a { color: var(--accent); }
+.top { display: flex; align-items: center; gap: 10px; }
+.top img { width: 30px; height: 30px; border-radius: 8px; }
+.top .name { font-weight: 700; margin: 0; }
+.top .spacer { flex: 1; }
+.lang { font: inherit; font-size: 14px; color: var(--accent); background: none; border: 0; padding: 0; cursor: pointer; }
+h1 { font-size: clamp(26px, 6vw, 34px); line-height: 1.25; margin: 30px 0 8px; letter-spacing: -.02em; }
+.sub { color: var(--ink-2); margin: 0; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: 22px; margin-top: 26px; box-shadow: 0 1px 2px rgba(18,19,22,.04), 0 10px 30px -14px rgba(18,19,22,.16); }
+.q { font-weight: 700; margin: 0 0 12px; }
+.q .opt-note { font-weight: 400; color: var(--muted); font-size: 14px; }
+.opts { display: grid; gap: 8px; }
+.opt { display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 12px; cursor: pointer; transition: border-color .15s, background .15s; }
+.opt:hover { border-color: var(--line-2); }
+.opt:has(input:checked) { border-color: var(--accent); background: var(--accent-soft); }
+.opt input { margin: 5px 0 0; width: 16px; height: 16px; accent-color: var(--accent); flex: none; }
+.opt label { flex: 1; cursor: pointer; font-size: 15px; }
+.help { margin: 2px 0 4px 38px; font-size: 14px; color: var(--ink-2); background: var(--bg-2); border-radius: 10px; padding: 10px 12px; }
+textarea, input[type=email] { width: 100%; font: inherit; font-size: 15px; color: var(--ink); background: var(--bg); border: 1px solid var(--line-2); border-radius: 12px; padding: 10px 12px; }
+textarea { min-height: 96px; resize: vertical; }
+textarea:focus, input[type=email]:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 15%, transparent); }
+.field { margin-top: 20px; }
+.field .q { margin-bottom: 8px; }
+.go { margin-top: 20px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+button.send { height: 46px; padding: 0 26px; border-radius: 999px; border: 0; background: var(--accent); color: var(--accent-ink); font: inherit; font-weight: 700; cursor: pointer; }
+button.send:hover:not(:disabled) { background: var(--accent-2); }
+button.send:disabled { opacity: .5; cursor: default; }
+.status { font-size: 14px; color: var(--muted); margin: 0; }
+.status.err { color: var(--err); }
+.thanks h2 { font-size: 24px; margin: 0 0 6px; }
+.thanks p { margin: 0 0 10px; color: var(--ink-2); }
+.again { margin-top: 26px; font-size: 15px; color: var(--ink-2); }
+footer { margin-top: 48px; padding-top: 18px; border-top: 1px solid var(--line); font-size: 13px; color: var(--muted); }
+</style>
+</head>
+<body>
+<main>
+  <div class="top">
+    <img src="img/icon48.png" alt="">
+    <p class="name">Bilibili 弹幕存档</p>
+    <span class="spacer"></span>
+    <button class="lang" type="button" data-lang-toggle lang="en">EN</button>
+  </div>
+
+  <h1>插件已经卸载了。</h1>
+  <p class="sub">能告诉我为什么吗？花 30 秒，帮我把它做得更好。</p>
+
+  <form id="survey" class="card" novalidate>
+    <p class="q">为什么卸载？<span class="opt-note">（可多选）</span></p>
+    <div class="opts">
+      <div class="opt"><input type="checkbox" id="r1" name="reason" value="存档失败 / 报错"><label for="r1">存档失败 / 报错</label></div>
+      <div class="help" data-for="r1" hidden>大多是 B 站风控（412）或者没登录 B 站。等几分钟再存一般就好了；要存完整弹幕需要先在浏览器里登录 B 站。</div>
+      <div class="opt"><input type="checkbox" id="r3" name="reason" value="不知道怎么用"><label for="r3">不知道怎么用</label></div>
+      <div class="help" data-for="r3" hidden>打开任意 B 站视频，点工具栏里的粉色图标，勾上分P点「存档弹幕」就行。<a href="./#how" target="_blank" rel="noopener">看看三步说明</a>。</div>
+      <div class="opt"><input type="checkbox" id="r4" name="reason" value="播放器 / 弹幕叠加不好用"><label for="r4">播放器 / 弹幕叠加不好用</label></div>
+      <div class="opt"><input type="checkbox" id="r5" name="reason" value="已经存完了，暂时用不上"><label for="r5">已经存完了，暂时用不上</label></div>
+      <div class="opt"><input type="checkbox" id="r6" name="reason" value="找到了别的工具"><label for="r6">找到了别的工具</label></div>
+      <div class="opt"><input type="checkbox" id="r8" name="reason" value="其他"><label for="r8">其他</label></div>
+    </div>
+
+    <div class="field">
+      <p class="q">还有什么想说的？<span class="opt-note">（可选）</span></p>
+      <textarea id="message" name="message" maxlength="3000" placeholder="哪里不好用、希望加什么功能，都可以写"></textarea>
+    </div>
+    <div class="field">
+      <p class="q">想让我回复你的话，留个邮箱<span class="opt-note">（可选）</span></p>
+      <input type="email" id="email" name="email" maxlength="200" placeholder="you@example.com" autocomplete="email">
+    </div>
+
+    <div class="go">
+      <button class="send" type="submit" id="send">提交</button>
+      <p class="status" id="status" role="status"></p>
+    </div>
+  </form>
+
+  <div id="thanks" class="card thanks" hidden>
+    <h2>谢谢！收到了。</h2>
+    <p>每一条我都会认真看。</p>
+  </div>
+
+  <p class="again">改主意了？<a href="https://chromewebstore.google.com/detail/bnnjcmnmblnjjkampoilckjbakigpnhm" target="_blank" rel="noopener">重新安装 Bilibili 弹幕存档</a></p>
+
+  <footer>本插件是个人开发的非官方工具，与哔哩哔哩（bilibili）、YouTube 没有任何关联。 · <a href="privacy.html">隐私政策</a></footer>
+</main>
+
+<script>
+// 答案提交到开发者自己的 Google 表单（「Bilibili 弹幕存档 · 卸载反馈」），页面里不出现任何邮箱地址。
+// 直接 POST 到表单的 formResponse，页面不跳走；Google 表单不回跨域响应，所以发出去就当成功。
+// 每道题对应一个 entry 编号；改了表单题目要同步改这里。只有用户点「提交」才会发出请求。
+(function () {
+  const FORM = {
+    action: 'https://docs.google.com/forms/d/e/1FAIpQLSeOEeToQjCrdd5SQIp1Mtf4yBTgNufQEfE6skfylX3pHTE9Ug/formResponse',
+    reason: 'entry.1669197136',
+    detail: 'entry.443650238',
+    version: 'entry.931143834',
+    browser: 'entry.169756751',
+    email: 'entry.1784103909',
+  };
+  const params = new URLSearchParams(location.search);
+  const version = (params.get('v') || '').slice(0, 20);
+  const extLang = (params.get('lang') || '').slice(0, 5);
+  const browser = /\bEdg\//.test(navigator.userAgent) ? 'edge' : /\bOPR\//.test(navigator.userAgent) ? 'opera' : 'chrome';
+
+  const form = document.getElementById('survey');
+  const send = document.getElementById('send');
+  const status = document.getElementById('status');
+  const isEn = () => (window.siteLang ? window.siteLang() : 'zh') === 'en';
+  const msg = (zh, en) => (isEn() ? en : zh);
+
+  // 勾上某些原因时，顺手给一句可能有用的解决办法
+  form.addEventListener('change', (e) => {
+    if (e.target.name !== 'reason') return;
+    const help = form.querySelector(`.help[data-for="${e.target.id}"]`);
+    if (help) help.hidden = !e.target.checked;
+  });
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const reasons = [...form.querySelectorAll('input[name=reason]:checked')].map((x) => x.value);
+    const message = form.message.value.trim();
+    const email = form.email.value.trim();
+    if (!reasons.length && !message) {
+      status.className = 'status err';
+      status.textContent = msg('选一个原因，或者写几句话再提交吧。', 'Pick a reason or write a few words first.');
+      return;
+    }
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      status.className = 'status err';
+      status.textContent = msg('邮箱格式好像不对。', "That email address doesn't look right.");
+      return;
+    }
+    send.disabled = true;
+    status.className = 'status';
+    status.textContent = msg('正在提交…', 'Sending…');
+    const body = new URLSearchParams();
+    body.append(FORM.reason, reasons.join('；') || '（没选）');
+    body.append(FORM.detail, message);
+    body.append(FORM.version, version || '（未知）');
+    body.append(FORM.browser, `${browser} / ${extLang || (isEn() ? 'en' : 'zh')}`);
+    body.append(FORM.email, email);
+    try {
+      await fetch(FORM.action, { method: 'POST', mode: 'no-cors', body, keepalive: true });
+      form.hidden = true;
+      document.getElementById('thanks').hidden = false;
+    } catch (err) {
+      send.disabled = false;
+      status.className = 'status err';
+      status.textContent = msg('没发出去，检查一下网络再试试。', "Couldn't send it. Check your connection and try again.");
+    }
+  });
+})();
+</script>
+<script type="application/json" id="i18n-en">
+{
+"title": "Uninstalled · Bilibili Danmaku Archive",
+"html": {
+"Bilibili 弹幕存档": "Bilibili Danmaku Archive",
+"插件已经卸载了。": "The extension has been removed.",
+"能告诉我为什么吗？花 30 秒，帮我把它做得更好。": "Could you tell me why? 30 seconds of your time helps me make it better.",
+"为什么卸载？<span class=\"opt-note\">（可多选）<\/span>": "Why did you uninstall it? <span class=\"opt-note\">(pick any)<\/span>",
+"存档失败 / 报错": "Saving failed / errors",
+"大多是 B 站风控（412）或者没登录 B 站。等几分钟再存一般就好了；要存完整弹幕需要先在浏览器里登录 B 站。": "This is usually Bilibili's rate limiting (412) or not being logged in. Waiting a few minutes and trying again normally fixes it; saving the full danmaku requires logging in to Bilibili in the browser first.",
+"不知道怎么用": "I couldn't figure out how to use it",
+"打开任意 B 站视频，点工具栏里的粉色图标，勾上分P点「存档弹幕」就行。<a href=\"./#how\" target=\"_blank\" rel=\"noopener\">看看三步说明<\/a>。": "Open any Bilibili video, click the pink icon in the toolbar, tick the parts and click “Save danmaku”. <a href=\"./#how\" target=\"_blank\" rel=\"noopener\">See the three steps<\/a>.",
+"播放器 / 弹幕叠加不好用": "The player / overlay didn't work well",
+"已经存完了，暂时用不上": "I've saved what I needed for now",
+"找到了别的工具": "I found another tool",
+"其他": "Something else",
+"还有什么想说的？<span class=\"opt-note\">（可选）<\/span>": "Anything else you'd like to say? <span class=\"opt-note\">(optional)<\/span>",
+"想让我回复你的话，留个邮箱<span class=\"opt-note\">（可选）<\/span>": "Leave an email if you'd like a reply <span class=\"opt-note\">(optional)<\/span>",
+"提交": "Send",
+"谢谢！收到了。": "Thank you — got it.",
+"每一条我都会认真看。": "I read every single one.",
+"改主意了？<a href=\"https://chromewebstore.google.com/detail/bnnjcmnmblnjjkampoilckjbakigpnhm\" target=\"_blank\" rel=\"noopener\">重新安装 Bilibili 弹幕存档<\/a>": "Changed your mind? <a href=\"https://chromewebstore.google.com/detail/bnnjcmnmblnjjkampoilckjbakigpnhm\" target=\"_blank\" rel=\"noopener\">Reinstall Bilibili Danmaku Archive<\/a>",
+"本插件是个人开发的非官方工具，与哔哩哔哩（bilibili）、YouTube 没有任何关联。 · <a href=\"privacy.html\">隐私政策<\/a>": "This extension is an unofficial tool made by an individual developer and is not affiliated with Bilibili or YouTube. · <a href=\"privacy.html\">Privacy policy<\/a>"
+},
+"attr": {
+"哪里不好用、希望加什么功能，都可以写": "What didn't work, what you'd like added — anything goes"
+}
+}
+</script>
+</body>
+</html>
